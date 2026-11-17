@@ -45,6 +45,10 @@ import type { City,SearchInputProps } from '@/types/types';
 function SearchInput({ onCitySelect }: SearchInputProps) {
   const [query, setQuery] = useState("");
 
+  const [searchQuery, setSearchQuery] = useState("");
+
+  const [searchCount, setSearchCount] = useState(0);
+
   const [cities, setCities] = useState<City[]>([]);
 
   const [isLoading, setIsLoading] = useState(false);
@@ -55,7 +59,7 @@ function SearchInput({ onCitySelect }: SearchInputProps) {
 
   // Search cities with debounce
   useEffect(() => {
-    if (!query.trim()) {
+    if (!searchQuery.trim()) {
       setCities([]);
       setError("");
       setIsLoading(false);
@@ -71,7 +75,7 @@ function SearchInput({ onCitySelect }: SearchInputProps) {
         setError("");
         setHasSearched(false);
 
-        const results = await searchCities(query.trim());
+        const results = await searchCities(searchQuery.trim());
 
         if (!ignore) {
           setCities(results);
@@ -92,11 +96,12 @@ function SearchInput({ onCitySelect }: SearchInputProps) {
       ignore = true;
       clearTimeout(timeoutId);
     };
-  }, [query]);
+  }, [searchQuery, searchCount]);
 
   // Handle input changes
   function handleChange(value: string) {
     setQuery(value);
+    setSearchQuery("");
     setCities([]);
     setError("");
     setHasSearched(false);
@@ -105,6 +110,7 @@ function SearchInput({ onCitySelect }: SearchInputProps) {
   // Handle city selection
   function handleCitySelect(city: City) {
     setQuery(city.name);
+    setSearchQuery("");
     setCities([]);
     setHasSearched(false);
 
@@ -116,6 +122,10 @@ function SearchInput({ onCitySelect }: SearchInputProps) {
     if (!query.trim()) {
       return;
     }
+
+
+    setSearchQuery(query.trim());
+    setSearchCount((prev) => prev + 1);
 
     // The automatic debounced search handles the API request.
   }
