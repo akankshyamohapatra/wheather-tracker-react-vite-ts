@@ -43,5 +43,6 @@ export interface City {
 
   export interface SearchInputProps {
     onCitySelect: (city: City) => void;
+    onSearchChange: () => void;
   }
   

@@ -42,7 +42,7 @@ import type { City,SearchInputProps } from '@/types/types';
 
 
 
-function SearchInput({ onCitySelect }: SearchInputProps) {
+function SearchInput({ onCitySelect, onSearchChange }: SearchInputProps) {
   const [query, setQuery] = useState("");
 
   const [cities, setCities] = useState<City[]>([]);
@@ -52,6 +52,8 @@ function SearchInput({ onCitySelect }: SearchInputProps) {
   const [error, setError] = useState("");
 
   const [hasSearched, setHasSearched] = useState(false);
+
+  const [isSuggestionsOpen, setIsSuggestionsOpen] = useState(false);
 
   // Search cities with debounce
   useEffect(() => {
@@ -100,6 +102,9 @@ function SearchInput({ onCitySelect }: SearchInputProps) {
     setCities([]);
     setError("");
     setHasSearched(false);
+    setIsSuggestionsOpen(true);
+
+    //onSearchChange();
   }
 
   // Handle city selection
@@ -107,20 +112,12 @@ function SearchInput({ onCitySelect }: SearchInputProps) {
     setQuery(city.name);
     setCities([]);
     setHasSearched(false);
+    setIsSuggestionsOpen(false);
 
     onCitySelect(city);
   }
 
-  // Handle search button
-  function handleSearch() {
-    if (!query.trim()) {
-      return;
-    }
-
-
-
-    // The automatic debounced search handles the API request.
-  }
+ 
 
   return (
     <div className="relative w-full">
@@ -131,18 +128,17 @@ function SearchInput({ onCitySelect }: SearchInputProps) {
           placeholder="Search for a city..."
           value={query}
           onChange={(event) => handleChange(event.target.value)}
+          onFocus={() => {setIsSuggestionsOpen(true);
+                          onSearchChange();
+                          }}
+          onClick={() => setIsSuggestionsOpen(true)}
           className="h-12"
         />
 
-        <Button
-          className="h-12 px-6"
-          onClick={handleSearch}
-        >
-          Search
-        </Button>
+       
       </div>
 
-      {query.trim() && (
+      {isSuggestionsOpen && query.trim() && (
         <CitySuggestions
           cities={cities}
           isLoading={isLoading}
